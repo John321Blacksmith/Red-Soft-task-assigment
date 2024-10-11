@@ -8,6 +8,7 @@ async def run_client():
     с серверным API через консоль.
     """
     reader, writer = await asyncio.open_connection('127.0.0.1', 8000)
+
     while True:
         print(
             """
@@ -83,12 +84,6 @@ async def run_client():
             vm_id = input('ID Виртуальной машины: ')
             ram_vol = input('Объем памяти: ')
             cpu_cores = input('Количество ядер: ')
-            hd_devices = []
-            hd_devices_amount = input('Количество жестких дисков: ')
-            if hd_devices_amount:
-                for i in range(int(hd_devices_amount)):
-                    memory_space = input(f'Объем памяти {i+1}-го ЖД: ')
-                    hd_devices.append({'mem_space': memory_space})
 
             request = {
                         'cmd': command,
@@ -111,13 +106,17 @@ async def run_client():
             result = loads(await reader.read(255))
             print(f'Server response: {result}')
             await writer.drain()
+        elif command == 't':
+            request = {'cmd': command, 'meth': 'GET'}
+            writer.write(dumps(request).encode('utf8'))
+            result = loads(await reader.read(255))
+            print(f'Server response: {result}')
         
         elif command == 'q':
             print('Exiting...')
             break
         else:
             print('Invalid command')
-
 
 
 if __name__ == '__main__':
