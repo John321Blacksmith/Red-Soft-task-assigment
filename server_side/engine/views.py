@@ -27,9 +27,9 @@ class VMManager:
                         {
                             'id': r['vm_id'],
                             'ram_vol': r['ram_vol'],
-                            'cpu': r['cpu_cores_amount']
-                    }
-                    for r in queryset
+                            'cpu': r['cpu_cores_amount'],
+                            'overall_hd_space': r['overall_hd_space']
+                    } for r in queryset
                 ]}
         return {'message': '404'}
 
@@ -39,7 +39,8 @@ class VMManager:
                 {
                     'vm_id': r['vm_id'],
                     'ram_vol': r['ram_vol'],
-                    'cpu_cores_amount': r['cpu_cores_amount']
+                    'cpu_cores_amount': r['cpu_cores_amount'],
+                    'overall_hd_space': r['overall_hd_space']
                 } for r in queryset
             ]
         return {'status': '200', 'results': result}
@@ -51,7 +52,8 @@ class VMManager:
                     {
                         'vm_id': r['vm_id'],
                         'ram_vol': r['ram_vol'],
-                        'cpu_cores_amount': r['cpu_cores_amount']
+                        'cpu_cores_amount': r['cpu_cores_amount'],
+                        'overall_hd_space': r['overall_hd_space']
                     } for r in queryset
                 ]
             return {'status': '200', 'results': result}
@@ -64,7 +66,8 @@ class VMManager:
                     {
                         'vm_id': r['vm_id'],
                         'ram_vol': r['ram_vol'],
-                        'cpu_cores_amount': r['cpu_cores_amount']
+                        'cpu_cores_amount': r['cpu_cores_amount'],
+                        'overall_hd_space': r['overall_hd_space']
                     } for r in queryset
                 ]
             return {'status': '200', 'results': result}
@@ -98,7 +101,14 @@ class VMManager:
                 if body['password'] == result['password']:
                     await self.db_manager.set_connection_state(**{'state': 'active', 'prof_id': result['prof_id']})
                     self.authorized_profiles[body['login']] = result
-                    return {'status': '200', 'credentials': {'prof_id': result['prof_id'], 'login': result['login'], 'password': result['password']}}
+                    return {
+                        'status': '200',
+                        'credentials': {
+                            'prof_id': result['prof_id'],
+                            'login': result['login'],
+                            'password': result['password']
+                            }
+                        }
                 return {'status': '404'}
             return {'status': '404'} # redirect to profile creation
         else:
@@ -117,13 +127,13 @@ class VMManager:
             return {'status': '201'}
         return {'status': '400'}
 
-    async def add_new_vm(self, **body) -> bool:
+    async def add_new_vm(self, **body):
         result = await self.db_manager.create_vm(**body)
         if result:
             return {'status': '201'}
         return {'status': '400'}
 
-    async def add_new_hd(self, **body) -> bool:
+    async def add_new_hd(self, **body):
         result = await self.db_manager.create_hd(**body)
         if result:
             return {'status': '201'}
@@ -140,3 +150,5 @@ class VMManager:
         if result:
             return {'status': '201', 'prof_id': result['prof_id']}
         return {'status': '400'}
+    
+    
