@@ -3,7 +3,7 @@ import views
 from time import sleep
 from json import loads, dumps
 from colorama import init as c_init
-from colorama import Fore
+from colorama import Fore, Style
 
 c_init(autoreset=True)
 
@@ -99,7 +99,7 @@ async def run_server():
     addr = s.sockets[0].getsockname()
     print(f'Server started on {Fore.YELLOW}{addr[0]}:{addr[1]}')
     sleep(1)
-    print('Listening for other sockets...')
+    print(f'\n\n\n==================' + f' {Fore.LIGHTBLUE_EX}SOCKET CONNECTIONS ' + f'{Style.RESET_ALL}===================\n')
 
     async with s:
         await s.serve_forever()
