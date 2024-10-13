@@ -6,8 +6,7 @@ from .queries import (
                         select_hds, select_connectable_vms,
                         create_profile, select_profile,
                         select_vms, select_connected_vms,
-                        logout_vm, set_conn_state,
-                        create_connection
+                        set_conn_state, create_connection
                     )
 
 class DBManager:
@@ -40,38 +39,38 @@ class DBManager:
     async def create_vm(self, **body):
         conn = await asyncpg.connect(dsn=self.url)
         result = []
-        new_vm = await conn.fetchrow(create_new_vm, body['ram_vol'], body['cpu_cores_amount'])
+        new_vm = await conn.fetchrow(create_new_vm, int(body['ram_vol']), int(body['cpu_cores_amount']))
         if new_vm:
             for i in range(len(body['hd_devices'])):
-                r = await conn.execute(create_hd_device, new_vm['vm_id'], body['hd_devices'][i]['memory_space'])
+                r = await conn.execute(create_hd_device, int(new_vm['vm_id']), int(body['hd_devices'][i]['memory_space']))
                 if r:
                     result.append(r)
-            await conn.execute(create_connection, new_vm['vm_id'], body['prof_id'])
+            await conn.execute(create_connection, int(new_vm['vm_id']), int(body['prof_id']))
         await conn.close()
         return result
     
     async def set_connection_state(self, **body):
         conn = await asyncpg.connect(dsn=self.url)
-        result = await conn.execute(set_conn_state, body['state'], body['prof_id'])
+        result = await conn.execute(set_conn_state, body['state'], int(body['prof_id']))
         await conn.close()
         return result
 
             
     async def create_hd(self, **body):
         conn = await asyncpg.connect(dsn=self.url)
-        result = await conn.execute(create_hd_device, body['vm_id'], body['hd_id'], body['memory_space'])
+        result = await conn.execute(create_hd_device, int(body['vm_id']), int(body['hd_id']), int(body['memory_space']))
         await conn.close()
         return result
     
     async def update_vm(self, vm_id: int, **body):
         conn = await asyncpg.connect(dsn=self.url)
-        result = await conn.execute(update_vm, body['ram_vol'], body['cpu_cores_amount'], vm_id)
+        result = await conn.execute(update_vm, int(body['ram_vol']), int(body['cpu_cores_amount']), int(vm_id))
         await conn.close()
         return result
         
     async def logout_vm(self, **body):
         conn = await asyncpg.connect(dsn=self.url)
-        result = await conn.execute(set_conn_state, 'inactive', body['prof_id'])
+        result = await conn.execute(set_conn_state, 'inactive', int(body['prof_id']))
         await conn.close()
         return result
     
