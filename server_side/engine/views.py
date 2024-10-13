@@ -87,7 +87,6 @@ class VMManager:
 
                 } for r in queryset
             ]
-            print(result)
             return {'status': '200', 'results': result}
         return {'status': '404'}
 
