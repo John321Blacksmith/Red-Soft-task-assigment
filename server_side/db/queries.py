@@ -47,26 +47,26 @@ create_hd_device = """
                 """
 
 select_authorized_vms = """
-                SELECT
-                    vm.vm_id,
-                    vm.ram_vol,
-                    vm.cpu_cores_amount,
-                    sum(hd.memory_space) as overall_hd_space
-                FROM
-                    vm_management.public.connection AS c
-                INNER JOIN
-                    vm_management.public.v_machine as vm
-                ON
-                    c.vm_id = vm.vm_id
-                INNER JOIN
-                    vm_management.public.hard_drive AS hd
-                ON
-                    vm.vm_id = hd.vm_id
-                WHERE
-                    c.status = 'active'
-                GROUP BY
-                    vm.vm_id;
-             """
+                        SELECT
+                            vm.vm_id,
+                            vm.ram_vol,
+                            vm.cpu_cores_amount,
+                            sum(hd.memory_space) as overall_hd_space
+                        FROM
+                            vm_management.public.connection AS c
+                        INNER JOIN
+                            vm_management.public.v_machine as vm
+                        ON
+                            c.vm_id = vm.vm_id
+                        INNER JOIN
+                            vm_management.public.hard_drive AS hd
+                        ON
+                            vm.vm_id = hd.vm_id
+                        WHERE
+                            c.status = 'active'
+                        GROUP BY
+                            vm.vm_id;
+                        """
 
 select_vms = """
                 SELECT
@@ -112,25 +112,42 @@ select_connectable_vms = """
                             SELECT
                                 vm.vm_id,
                                 vm.ram_vol,
-                                vm.cpu_cores_amount
+                                vm.cpu_cores_amount,
+                                sum(hd.memory_space) as overall_hd_space
                             FROM
-                                 vm_management.public.connection AS c
+                                vm_management.public.connection AS c
                             INNER JOIN
-                                 vm_management.public.v_machine AS vm
+                                vm_management.public.v_machine as vm
                             ON
-                                c.vm_id = vm.vm_id;
+                                c.vm_id = vm.vm_id
+                            INNER JOIN
+                                vm_management.public.hard_drive AS hd
+                            ON
+                                vm.vm_id = hd.vm_id
+                            GROUP BY
+                                vm.vm_id;
                          """
+
 select_connected_vms = """
-                        SELECT
-                            *
-                        FROM
-                            vm_management.public.connection AS c
-                        RIGHT JOIN
-                            vm_management.public.v_machine AS vm
-                        ON
-                            c.vm_id = vm.vm_id
-                        WHERE
-                            c.status = 'active';
+                            SELECT
+                                vm.vm_id,
+                                vm.ram_vol,
+                                vm.cpu_cores_amount,
+                                sum(hd.memory_space) as overall_hd_space
+                            FROM
+                                vm_management.public.connection AS c
+                            INNER JOIN
+                                vm_management.public.v_machine as vm
+                            ON
+                                c.vm_id = vm.vm_id
+                            INNER JOIN
+                                vm_management.public.hard_drive AS hd
+                            ON
+                                vm.vm_id = hd.vm_id
+                            WHERE
+                                c.status = 'active'
+                            GROUP BY
+                                vm.vm_id;
                         """
 
 create_profile = """
