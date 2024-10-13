@@ -3,78 +3,109 @@ create_db = """
             """
 
 create_tables = """
-                    CREATE TABLE v_machine(
-                        vm_id SERIAL PRIMARY KEY,
+                    CREATE TABLE vm_management.public.v_machine(
+                        vm_id serial PRIMARY KEY,
                         ram_vol INT NOT NULL,
-                        cpu_cores_amount INT
+                        cpu_cores_amount INT NOT NULL
                     );
 
-
-                    CREATE TABLE hard_drive(
-                        hd_id SERIAL PRIMARY KEY,
+                    CREATE table vm_management.public.hard_drive(
+                        hd_id serial PRIMARY KEY,
                         vm_id INT,
                         memory_space INT NOT NULL,
-                        CONSTRAINT fk_vm
-                            FOREIGN KEY (vm_id)
-                                REFERENCES v_machine(vm_id)
-                                ON DELETE CASCADE
+                        FOREIGN KEY (vm_id)
+                            REFERENCES vm_management.public.v_machine(vm_id)
                     );
 
-                    CREATE TABLE account(
-                        acc_id SERIAL PRIMARY KEY,
-                        login VARCHAR(255) NOT NULL,
-                        password VARCHAR(255) NOT NULL,
-                        CONSTRAINT fk_account
-                            FOREIGN KEY(acc_id)
-                            ON DELETE SET NULL
+                    CREATE TABLE vm_management.public.profile(
+                        prof_id serial PRIMARY KEY,
+                        login VARCHAR(255) UNIQUE NOT NULL,
+                        password VARCHAR(255) UNIQUE NOT NULL
                     );
 
-                    CREATE TABLE connection(
-                        conn_id SERIAL PRIMARY KEY,
+                    CREATE TABLE vm_management.public.connection(
+                        conn_id serial PRIMARY KEY,
                         vm_id INT,
-                        acc_id INT,
-                        CONSTRAINT fk_vm
-                            FOREIGN KEY v_machine(vm_id)
-                            ON DELETE SET NULL
-                        CONSTRAINT fk_acc
-                            FOREIGN KEY account(acc_id)
-                            ON DELETE SET NULL
+                        prof_id INT,
+                        FOREIGN KEY (vm_id)
+                            REFERENCES vm_management.public.v_machine(vm_id),
+                        FOREIGN KEY (prof_id)
+                            REFERENCES vm_management.public.profile(prof_id)
                     );
                 """
 
-add_new_vm = """
-                INSERT INTO v_machine(vm_id, ram_vol, cpu_cores)
-                VALUES ($1, $2, $3);
+create_new_vm = """
+                INSERT INTO vm_management.public.v_machine(ram_vol, cpu_cores_amount)
+                VALUES ($1, $2)
+                RETURNING vm_id;
              """
 
-add_hd_device = """
-                INSERT INTO hard_drive(hd_id, vm_id, memory_space)
-                VALUES ($1, $2, $3);
+create_hd_device = """
+                INSERT INTO vm_management.public.hard_drive(vm_id, memory_space)
+                VALUES ($1, $2)
+                RETURNING hd_id;
                 """
+
+select_authorized_vms = """
+                SELECT
+                    vm.vm_id,
+                    vm.ram_vol,
+                    vm.cpu_cores_amount,
+                    sum(hd.memory_space) as overall_hd_space
+                FROM
+                    vm_management.public.connection AS c
+                INNER JOIN
+                    vm_management.public.v_machine as vm
+                ON
+                    c.vm_id = vm.vm_id
+                INNER JOIN
+                    vm_management.public.hard_drive AS hd
+                ON
+                    vm.vm_id = hd.vm_id
+                WHERE
+                    c.status = 'active'
+                GROUP BY
+                    vm.vm_id;
+             """
 
 select_vms = """
                 SELECT
                     vm.vm_id,
                     vm.ram_vol,
-                    vm.cpu_cores
+                    vm.cpu_cores_amount
                 FROM 
-                    v_machine AS vm;
+                    vm_management.public.v_machine AS vm;
              """
 
 update_vm = """
-            UPDATE v_machine
+            UPDATE vm_management.public.v_machine AS vm
             SET
                 ram_vol = $1
                 cpu_cores_amount = $2
+            FROM 
+                vm_management.public.connection AS c
             WHERE
-                vm_id = $3;
+                vm.vm_id = $3
+                AND c.status = 'active';
+            """
+
+logout_vm = """
+            UPDATE vm_management.public.connection as c
+            SET
+                status=$1
+            FROM
+                vm_management.public.v_machine as vm
+            WHERE
+                vm.vm_id = c.vm_id
+                AND vm.id = $2
+                AND c.status = 'active';
             """
 
 select_hds = """
                 SELECT
                     *
                 FROM
-                    hard_drive;
+                     vm_management.public.hard_drive;
              """
 
 select_connectable_vms = """
@@ -83,13 +114,52 @@ select_connectable_vms = """
                                 vm.ram_vol,
                                 vm.cpu_cores_amount
                             FROM
-                                connection AS c
+                                 vm_management.public.connection AS c
                             INNER JOIN
-                                v_machine AS vm
+                                 vm_management.public.v_machine AS vm
                             ON
                                 c.vm_id = vm.vm_id;
                          """
+select_connected_vms = """
+                        SELECT
+                            *
+                        FROM
+                            vm_management.public.connection AS c
+                        RIGHT JOIN
+                            vm_management.public.v_machine AS vm
+                        ON
+                            c.vm_id = vm.vm_id
+                        WHERE
+                            c.status = 'active';
+                        """
 
-select_test = """
-                SELECT * from staff;
-              """
+create_profile = """
+                INSERT INTO  vm_management.public.profile(login, password)
+                VALUES ($1, $2)
+                RETURNING prof_id;
+                """
+
+create_connection = """
+                    INSERT INTO  vm_management.public.connection(vm_id, prof_id, status)
+                    VALUES($1, $2, 'active');
+                    """
+
+select_profile = """
+                SELECT
+                    *
+                FROM
+                     vm_management.public.profile
+                WHERE
+                    login = $1;
+                """
+
+set_conn_state = """
+                UPDATE vm_management.public.connection AS c
+                SET
+                    status = $1
+                FROM
+                    vm_management.public.profile as prof
+                WHERE
+                    c.prof_id = prof.prof_id
+                    AND prof.prof_id = $2;
+                """
