@@ -31,15 +31,16 @@ def get_env_vars() -> dict[str, str|None]:
 vm_manager = views.VMManager(**get_env_vars())
 
 # фабрика методов для обработчика запр-ов
-actions = {
+routes = {
     '1': vm_manager.add_new_vm,
-    '2': vm_manager.list_vms,
+    '2': vm_manager.list_connected_vms,
     '3': vm_manager.list_authorized_vms,
     '4': vm_manager.list_connectable_vms,
     '5': vm_manager.logout_vm,
     '6': vm_manager.update_vm_data,
     '7': vm_manager.list_hard_drives,
-    't': vm_manager.list_test_data
+    'auth': vm_manager.authentificate,
+    'new_profile': vm_manager.add_profile
 }
 
 
@@ -51,37 +52,48 @@ async def handle_requests(reader, writer):
     """
     addr = writer.get_extra_info('peername')
     print(f'{Fore.GREEN}Connection from {Fore.YELLOW}{addr[0]}:{addr[1]}' + ' ' + f'{Fore.GREEN}was initialized')
+
     while True:
         request_coroutine = await reader.read(255)
-        request = loads(request_coroutine)
-        result = None
-        if request['cmd'] in actions:
-            if request['meth'] == 'POST':
-                result = await actions[request['cmd']](**request['body'])
-            elif request['meth'] == 'DELETE':
-                result = await actions[request['cmd']](**request['pk'])
-            elif request['meth'] == 'PATCH':
-                result = await actions[request['cmd']](**request['body'])
-            elif request['meth'] == 'GET':
-                result = await actions[request['cmd']]()
-            else:
-                result = dumps({'message': 'method not allowed'})
-            writer.write(dumps(result).encode('utf8'))
-            await writer.drain()
+        if request_coroutine == b'':
+            print(f'{Fore.MAGENTA}Connection from client {Fore.YELLOW}{addr[0]}:{addr[1]} {Fore.MAGENTA}closed')
+            break
         else:
-            writer.write(dumps({'message': 'bad request'}).encode('utf8'))
-            await writer.drain()
+            request = loads(request_coroutine)
+            result = None
+            if request['cmd'] in routes:
+                if request['meth'] == 'POST':
+                    result = await routes[request['cmd']](**request['body'])
+                elif request['meth'] == 'DELETE':
+                    result = await routes[request['cmd']](**request['id'])
+                elif request['meth'] == 'PATCH':
+                    result = await routes[request['cmd']](request['id'], **request['body'])
+                elif request['meth'] == 'GET':
+                    result = await routes[request['cmd']]()
+                else:
+                    result = dumps({'message': 'method not allowed'})
+                writer.write(dumps(result).encode('utf8')) # serialize data for the client
+                await writer.drain()
+            else:
+                writer.write(dumps({'message': 'bad request'}).encode('utf8'))
+                await writer.drain()
 
 
 async def run_server():
     """
     Поднятие сервера.
     """
-    db_option = input('Do you need to set up DB? [y/n] ')
+    db_option = input('Do you need to set up DB? [y/n]: ')
     if db_option == 'y':
         result = await vm_manager.setup_storage()
         if result:
             print(f'{Fore.LIGHTBLUE_EX}Database initialized...')
+    db_option = input('Do you need to create tables? [y/n]: ')
+    if db_option == 'y':
+        result = await vm_manager.create_tables()
+        if result:
+            print(f'{Fore.LIGHTBLUE_EX}The tables have been created')
+
     sleep(1)
     s = await asyncio.start_server(handle_requests, '127.0.0.1', 8000)
     addr = s.sockets[0].getsockname()
