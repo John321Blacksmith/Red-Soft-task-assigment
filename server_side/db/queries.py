@@ -80,7 +80,7 @@ select_vms = """
 update_vm = """
             UPDATE vm_management.public.v_machine AS vm
             SET
-                ram_vol = $1
+                ram_vol = $1,
                 cpu_cores_amount = $2
             FROM 
                 vm_management.public.connection AS c
