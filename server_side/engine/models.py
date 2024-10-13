@@ -18,3 +18,24 @@ class VirtualMachine:
     ram_vol: int
     cpu_cores: int
     hd_devices: List[HardDrive]
+
+
+class Profile:
+    """
+    Модель представляет объект
+    Профиля клиента.
+    """
+    prof_id: int
+    login: str
+    password: str
+
+
+class Connection:
+    """
+    Модель представляет объект
+    клиентского подключения.
+    """
+    conn_id: int
+    v_machine: VirtualMachine
+    profile: Profile
+
