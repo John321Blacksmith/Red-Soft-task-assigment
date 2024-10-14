@@ -54,3 +54,20 @@ cd server_side/engine
 ```
 python server.py
 ```
+
+## Запуск одного и более клиентов
+1. Активируем окружение и переходим на клиетскую директорию
+```
+# win
+.venv\Scripts\activate
+
+# linux
+.venv\Scripts\activate
+
+cd client_app
+```
+
+2. Запускаем консольную программу:
+```
+python client.py
+```
