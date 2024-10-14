@@ -38,4 +38,5 @@ class Connection:
     conn_id: int
     v_machine: VirtualMachine
     profile: Profile
+    status: str
 

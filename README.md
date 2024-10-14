@@ -16,6 +16,7 @@
 ## Установка
 1. Клоним репозиторий:
 ```
+git init
 git clone https://github.com/John321Blacksmith/Red-Soft-task-assigment.git
 ```
 
