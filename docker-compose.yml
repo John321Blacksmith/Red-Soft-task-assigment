@@ -4,9 +4,9 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=superpassword123
-      - POSTGRES_DB=vm_management
+      - POSTGRES_USER={PGUSER}
+      - POSTGRES_PASSWORD={PGPASSWORD}
+      - POSTGRES_DB={PGDATABASE}
     ports:
       - "5432:5432"
 volumes:
