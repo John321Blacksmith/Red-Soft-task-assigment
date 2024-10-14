@@ -71,7 +71,7 @@ python server.py
 .venv\Scripts\activate
 
 # linux
-.venv\Scripts\activate
+source .venv/bin/activate
 
 cd client_app
 ```
