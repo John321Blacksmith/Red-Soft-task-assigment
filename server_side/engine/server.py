@@ -1,5 +1,5 @@
 import asyncio
-import views
+from .views import VMManager
 from time import sleep
 from json import loads, dumps
 from colorama import init as c_init
@@ -28,7 +28,7 @@ def get_env_vars() -> dict[str, str|None]:
     return db_configs
 
 
-vm_manager = views.VMManager(**get_env_vars())
+vm_manager = VMManager(**get_env_vars())
 
 # фабрика методов для обработчика запр-ов
 routes = {
@@ -103,7 +103,3 @@ async def run_server():
 
     async with s:
         await s.serve_forever()
-
-
-if __name__ == '__main__':
-    asyncio.run(run_server())

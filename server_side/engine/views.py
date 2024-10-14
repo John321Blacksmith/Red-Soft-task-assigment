@@ -2,7 +2,7 @@ import sys
 sys.path.append('../')
 from typing import List
 from db.transactions import DBManager
-from models import HardDrive, VirtualMachine, Profile, Connection
+from .models import HardDrive, VirtualMachine, Profile, Connection
 
 
 class VMManager:
