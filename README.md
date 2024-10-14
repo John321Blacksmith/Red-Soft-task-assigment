@@ -44,10 +44,10 @@ pip install -r requirements.txt
    В compose файле, укажите те же конфигурации, что и в окружении.
    Инициализируем образ:
 ```
-docker compose up --build
+docker compose --build
 ```
 
-5. Поднимем контейнер с postgres:
+5. Поднимаем контейнер с postgres:
 ```
 # 
 # Запуск в фоновом режиме
@@ -58,13 +58,10 @@ docker compose up
 ```
 
 ## Запуск движка
-1. Переходим на директорию с сервером:
+
+1. Вводим:
 ```
-cd server_side/engine
-```
-2. Запуск сервера:
-```
-python server.py
+python server_side/launch.py
 ```
 
 ## Запуск одного и более клиентов
