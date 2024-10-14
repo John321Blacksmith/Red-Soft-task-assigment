@@ -8,6 +8,7 @@
 ## Стек технологий
 <div align="center">
    <img src="https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=blue" />
+   <img src='https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white' />
    <img src="https://img.shields.io/badge/Docker-9999FF.svg?style=for-the-badge&logo=Docker&logoColor=white" />
    <img src="https://img.shields.io/badge/VS%20Code%20Insiders-35b393.svg?style=for-the-badge&logo=visual-studio-code&logoColor=white" />
 </div>
