@@ -35,6 +35,8 @@ python -m venv .venv
 
 # linux
 source .venv/bin/activate
+
+pip install -r requirements.txt
 ```
 
 4. Перед запуском инструкции, убедитесь, что Docker машина запущена.
