@@ -1,9 +1,4 @@
 services:
-  vm_manager:
-    command: 'cd server_side/engine && python server.py'
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
-
   postgres:
     image: postgres:15
     volumes:
