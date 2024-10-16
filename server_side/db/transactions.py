@@ -19,24 +19,37 @@ class DBManager:
         self.url = f'postgresql://{self.conf['user']}:{self.conf['password']}@{self.conf['host']}:{self.conf['port']}/{self.conf['db']}'
 
     async def create_db(self):
+        """
+        Cоздание новой БД.
+        """
         conn = await asyncpg.connect(dsn=self.url)
         result = await conn.execute(create_db)
         await conn.close()
         return result
 
     async def create_profile(self, **body):
+        """
+        Cоздание нового Профиля.
+        """
         conn = await asyncpg.connect(dsn=self.url)
         result = await conn.fetchrow(create_profile, body['login'], body['password'])
         await conn.close()
         return result
 
     async def create_tables(self):
+        """
+        Cоздание необходимых
+        таблиц.
+        """
         conn = await asyncpg.connect(dsn=self.url)
         result = await conn.execute(create_tables)
         await conn.close()
         return result
 
     async def create_vm(self, **body):
+        """
+        Cоздание новой ВМ.
+        """
         conn = await asyncpg.connect(dsn=self.url)
         result = []
         new_vm = await conn.fetchrow(create_new_vm, int(body['ram_vol']), int(body['cpu_cores_amount']))
@@ -50,6 +63,11 @@ class DBManager:
         return result
     
     async def set_connection_state(self, **body):
+        """
+        Получение состояния
+        подключения, связанного с 
+        определенным профилем.
+        """
         conn = await asyncpg.connect(dsn=self.url)
         result = await conn.execute(set_conn_state, body['state'], int(body['prof_id']))
         await conn.close()
@@ -57,54 +75,83 @@ class DBManager:
 
             
     async def create_hd(self, **body):
+        """
+        Создание Ж-диска
+        и его привязку к ВМ.
+        """
         conn = await asyncpg.connect(dsn=self.url)
         result = await conn.execute(create_hd_device, int(body['vm_id']), int(body['hd_id']), int(body['memory_space']))
         await conn.close()
         return result
     
     async def update_vm(self, vm_id: int, **body):
+        """
+        Запрос на модификацию ВМ.
+        """
         conn = await asyncpg.connect(dsn=self.url)
         result = await conn.execute(update_vm, int(body['ram_vol']), int(body['cpu_cores_amount']), int(vm_id))
         await conn.close()
         return result
         
     async def logout_vm(self, **body):
+        """
+        Запрос на деактивацию состояния
+        подключения.
+        """
         conn = await asyncpg.connect(dsn=self.url)
         result = await conn.execute(set_conn_state, 'inactive', int(body['prof_id']))
         await conn.close()
         return result
     
     async def select_vms(self):
+        """
+        Получение списка всех ВМ.
+        """
         conn = await asyncpg.connect(dsn=self.url)
         result = await conn.fetch(select_vms)
         await conn.close()
         return result
     
     async def select_authorized_vms(self):
+        """
+        Получение списка авторизированных ВМ.
+        """
         conn = await asyncpg.connect(dsn=self.url)
         result = await conn.fetch(select_authorized_vms)
         await conn.close()
         return result
         
     async def select_hard_drives(self):
+        """
+        Получение списка всех ЖД.
+        """
         conn = await asyncpg.connect(dsn=self.url)
         result = await conn.fetch(select_hds)
         await conn.close()
         return result
 
     async def select_connectable_vms(self):
+        """
+        Получение списка подключаемых ВМ.
+        """
         conn = await asyncpg.connect(dsn=self.url)
         result = await conn.fetch(select_connectable_vms)
         await conn.close()
         return result
     
     async def select_connected_vms(self):
+        """
+        Получение списка подключенных ВМ.
+        """
         conn = await asyncpg.connect(dsn=self.url)
         result = await conn.fetch(select_connected_vms)
         await conn.close()
         return result
     
     async def select_profile(self, login: str):
+        """
+        Получение одной записи Профиля.
+        """
         conn = await asyncpg.connect(dsn=self.url)
         result = await conn.fetchrow(select_profile, login)
         await conn.close()
