@@ -18,6 +18,13 @@ class DBManager:
         self.conf = conf
         self.url = f'postgresql://{self.conf['user']}:{self.conf['password']}@{self.conf['host']}:{self.conf['port']}/{self.conf['db']}'
 
+    async def check_db(self):
+        """
+        Проверка существования БД
+        и её таблиц.
+        """
+        ...
+
     async def create_db(self):
         """
         Cоздание новой БД.
