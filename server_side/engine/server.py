@@ -79,20 +79,35 @@ async def handle_requests(reader, writer):
                 await writer.drain()
 
 
+async def db_created(**configs)-> bool:
+    """
+    Проверка структуры БД.
+    Возвращение True, если
+    она существует, False,
+    в противном случае.
+    Args:
+        configs: dict[str, str]
+    :return: bool
+    """
+    ...
+
 async def run_server():
     """
     Поднятие сервера.
     """
-    db_option = input('Do you need to set up DB? [y/n]: ')
-    if db_option == 'y':
-        result = await vm_manager.setup_storage()
-        if result:
-            print(f'{Fore.LIGHTBLUE_EX}Database initialized...')
-    db_option = input('Do you need to create tables? [y/n]: ')
-    if db_option == 'y':
-        result = await vm_manager.create_tables()
-        if result:
-            print(f'{Fore.LIGHTBLUE_EX}The tables have been created')
+    # При запуске, проверяется состояние хранилища
+    db_check = await db_created()
+    if not db_check:
+        db_option = input('Do you need to set up DB? [y/n]: ')
+        if db_option == 'y':
+            result = await vm_manager.setup_storage()
+            if result:
+                print(f'{Fore.LIGHTBLUE_EX}Database initialized...')
+        db_option = input('Do you need to create tables? [y/n]: ')
+        if db_option == 'y':
+            result = await vm_manager.create_tables()
+            if result:
+                print(f'{Fore.LIGHTBLUE_EX}The tables have been created')
 
     sleep(1)
     s = await asyncio.start_server(handle_requests, '127.0.0.1', 8000)
