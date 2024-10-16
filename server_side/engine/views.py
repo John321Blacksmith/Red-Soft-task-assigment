@@ -19,6 +19,9 @@ class VMManager:
         self.authorized_profiles: dict[str, Profile] = {}
 
     async def list_vms(self) -> List[VirtualMachine]:
+        """
+        Сериализация списка всех ВМ.
+        """
         queryset = await self.db_manager.select_vms()
         if queryset:
             return {
@@ -34,6 +37,9 @@ class VMManager:
         return {'message': '404'}
 
     async def list_authorized_vms(self) -> List[VirtualMachine]:
+        """
+        Сериализация списка авторизированных ВМ.
+        """
         queryset = await self.db_manager.select_authorized_vms()
         result = [
                 {
@@ -46,6 +52,9 @@ class VMManager:
         return {'status': '200', 'results': result}
 
     async def list_connected_vms(self)-> List[VirtualMachine]:
+        """
+        Сериализация списка подключненных ВМ
+        """
         queryset = await self.db_manager.select_connected_vms()
         if queryset:
             result = [
@@ -60,6 +69,9 @@ class VMManager:
         return {'status': '404'}
 
     async def list_connectable_vms(self) -> List[VirtualMachine]:
+        """
+        Сериализация списка подключаемых ВМ.
+        """
         queryset = await self.db_manager.select_connectable_vms()
         if queryset:
             result = [
@@ -74,12 +86,18 @@ class VMManager:
         return {'status': '404'}
 
     async def logout_vm(self, **body) -> bool:
+        """
+        Процесс выхода ВМ из списка подключенных.
+        """
         result = await self.db_manager.logout_vm(**body)
         if result:
             return {'status': '201'}
         return {'status': '400'}
 
     async def list_hard_drives(self) -> List[HardDrive]:
+        """
+        Сериализация списка всех ЖД.
+        """
         queryset = await self.db_manager.select_hard_drives()
         if queryset:
             result = [
@@ -94,6 +112,9 @@ class VMManager:
         return {'status': '404'}
 
     async def authentificate(self, **body):
+        """
+        Процесс верификации профиля
+        """
         if body['login'] not in self.authorized_profiles:
             obj = await self.db_manager.select_profile(body['login'])
             if obj:
@@ -117,35 +138,58 @@ class VMManager:
         return {'status': '200', 'credentials': self.authorized_profiles[body['login']]}
         
     async def setup_storage(self):
+        """
+        Процесс создания базы данных
+        на Postgres сервере.
+        """
         result = await self.db_manager.create_db()
         if result:
             return {'status': '201'}
         return {'status': '400'}
+    
     async def create_tables(self):
+        """
+        Процесс создания всех таблиц.
+        """
         result = await self.db_manager.create_tables()
         if result:
             return {'status': '201'}
         return {'status': '400'}
 
     async def add_new_vm(self, **body):
+        """
+        Процесс добавления новой ВМ.
+        """
         result = await self.db_manager.create_vm(**body)
         if result:
             return {'status': '201'}
         return {'status': '400'}
 
     async def add_new_hd(self, **body):
+        """
+        Процесс добавления нового ЖД
+        с привязкой к ВМ.
+        """
         result = await self.db_manager.create_hd(**body)
         if result:
             return {'status': '201'}
         return {'status': '400'}
         
     async def update_vm_data(self, vm_id: int, **body):
+        """
+        Процесс обновления авторизированной
+        ВМ.
+        """
         result = await self.db_manager.update_vm(vm_id, **body)
         if result:
             return {'status': '201'}
         return {'status': '400'}
         
     async def add_profile(self, **body):
+        """
+        Процесс создания нового
+        профиля.
+        """
         result = await self.db_manager.create_profile(**body)
         if result:
             return {'status': '201', 'prof_id': result['prof_id']}
