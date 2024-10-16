@@ -1,13 +1,16 @@
 services:
   vm_manager:
+    container_name: vm_manager
     image: python:3.12.4
-    command: python server_side/launch.py
     ports:
       - "8000:8000"
+    env_file:
+      - .env
+    build:
+      context: .
+      dockerfile: Dockerfile
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-    env_file:
-      - ./.env
     depends_on:
       - db
 
@@ -15,13 +18,16 @@ services:
     image: postgres:15
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - .env
     environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_HOST=${POSTGRES_HOST}
-      - POSTGRES_PORT=${POSTGRES_PORT}
-      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${PG_USER}
+      - POSTGRES_PASSWORD=${PGPASSWORD}
+      - POSTGRES_HOST=${PGHOST}
+      - POSTGRES_PORT=${PGPORT}
+      - POSTGRES_DB=${PGDATABASE}
     ports:
       - "5432:5432"
+
 volumes:
   postgres_data:

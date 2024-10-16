@@ -1,4 +1,4 @@
-FROM python:3.12-slim
+FROM python:3.12.4
 
 ENV PYTHONDONTWRITEBYTECODE=1
 
@@ -12,4 +12,6 @@ RUN python -m pip install -r requirements.txt
 WORKDIR /vm_manager
 COPY . /vm_manager
 
-CMD ["python", "launch.py"]
+EXPOSE 8000
+
+CMD ["python", "server_side/launch.py"]
