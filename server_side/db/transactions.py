@@ -9,7 +9,7 @@ from .queries import (
                         select_vms, select_connected_vms,
                         set_conn_state, create_connection
                     )
-from exceptions import DBError
+from .exceptions import DBError
 
 
 class DBManager:

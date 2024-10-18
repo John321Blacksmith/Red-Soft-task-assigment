@@ -2,8 +2,9 @@ import sys
 sys.path.append('../')
 from typing import List
 from functools import wraps
-from db.transactions import DBManager, DBError
+from db.transactions import DBManager
 from .models import HardDrive, VirtualMachine, Profile, Connection
+from db.exceptions import DBError
 
 
 class VMManager:
