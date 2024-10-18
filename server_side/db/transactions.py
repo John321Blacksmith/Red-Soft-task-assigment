@@ -29,7 +29,7 @@ class DBManager:
         """
         ...
     
-    def transaction(self, funct):
+    def transaction(funct):
         """
         Проверка процесса транзакции на исключенияю
         """
