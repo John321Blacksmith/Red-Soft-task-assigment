@@ -27,7 +27,7 @@ class VMManager:
             except DBError:
                 return {'status': '400'}
             else:
-                return {'status': '201'}
+                return {'status': '201', 'result': result}
             
 
     async def list_vms(self) -> List[VirtualMachine]:
@@ -199,8 +199,6 @@ class VMManager:
         профиля.
         """
         result = await self.db_manager.create_profile(**body)
-        if result:
-            return {'status': '201', 'prof_id': result['prof_id']}
-        return {'status': '400'}
+        return result
     
     
