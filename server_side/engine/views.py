@@ -19,11 +19,11 @@ class VMManager:
         self.db_manager = DBManager(**conf)
         self.authorized_profiles: dict[str, Profile] = {}
 
-    def mutation(self, funct):
+    def mutation(funct):
         @wraps(funct)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(self, *args, **kwargs):
             try:
-                result = await funct(*args, **kwargs)
+                result = await funct(self, *args, **kwargs)
             except DBError:
                 return {'status': '400'}
             else:
@@ -32,9 +32,9 @@ class VMManager:
 
     def query(self, funct):
         @wraps(funct)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(self, *args, **kwargs):
             try:
-                result = await funct(*args, **kwargs)
+                result = await funct(self, *args, **kwargs)
             except DBError:
                 return {'message': '404'}
             else:
