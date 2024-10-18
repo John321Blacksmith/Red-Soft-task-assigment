@@ -33,7 +33,7 @@ class DBManager:
         """
         Проверка процесса транзакции на исключенияю
         """
-        @wrapper(funct)
+        @wraps(funct)
         async def wrapper(self, *args, **kwargs):
             try:
                 result = await funct(self, *args, **kwargs)
