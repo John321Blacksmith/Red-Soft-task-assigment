@@ -35,7 +35,7 @@ class DBManager:
         """
         async def wrapper(*args, **kwargs):
             try:
-                result = funct(*args, **kwargs)
+                result = await funct(*args, **kwargs)
             except (ValueError, TypeError):
                 raise DBError('Данные не получены')
             else:
