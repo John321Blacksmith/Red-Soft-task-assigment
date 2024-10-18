@@ -28,6 +28,7 @@ class VMManager:
                 return {'status': '400'}
             else:
                 return {'status': '201', 'result': result}
+        return wrapper
             
 
     async def list_vms(self) -> List[VirtualMachine]:
