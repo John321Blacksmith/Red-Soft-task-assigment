@@ -7,12 +7,19 @@ c_init(autoreset=True)
 
 
 async def get_response(**kwargs):
+    """
+    Отправка не сервер тела зпроса
+    и получение ответа.
+    """
     kwargs['writer'].write(dumps(kwargs['request']).encode('utf8'))
     result = loads(await kwargs['reader'].read(4096))
     return result
     
 
 async def create_vm(**kwargs):
+    """
+    Создать новую ВМ.
+    """
     ram_vol = input('Объем памяти (Гб): ')
     cpu_cores = input('Количество ядер: ')
     hd_devices = []
@@ -41,6 +48,9 @@ async def create_vm(**kwargs):
 
 
 async def authorized_vms(**kwargs):
+    """
+    Распечатать список авторизированных ВМ.
+    """
     request = {'cmd': kwargs['command'], 'meth': 'GET'}
     result = await get_response(reader=kwargs['reader'], writer=kwargs['writer'], request=request)
     if result['status'] == '200':
@@ -55,7 +65,11 @@ async def authorized_vms(**kwargs):
         print(f'{Fore.LIGHTBLUE_EX}Список пока пуст.')
     await kwargs['writer'].drain()
 
+
 async def connected_vms(**kwargs):
+    """
+    Распечатать список подключенных ВМ.
+    """
     request = {'cmd': kwargs['command'], 'meth': 'GET'}
     result = await get_response(reader=kwargs['reader'], writer=kwargs['writer'], request=request)
     if result['status'] == '200':
@@ -71,7 +85,11 @@ async def connected_vms(**kwargs):
 
     await kwargs['writer'].drain()
 
+
 async def connectable_vms(**kwargs):
+    """
+    Распечатать список подключаемых ВМ.
+    """
     request = {'cmd': kwargs['command'], 'meth': 'GET'}
     result = await get_response(reader=kwargs['reader'], writer=kwargs['writer'], request=request)
     if result['status'] == '200':
@@ -88,6 +106,9 @@ async def connectable_vms(**kwargs):
     
 
 async def deactivate_vms(**kwargs):
+    """
+    Выйти из авторизированной ВМ.
+    """
     request = {'cmd': kwargs['command'], 'meth': 'POST', 'body': {'prof_id': kwargs['cache']['credentials']['prof_id']}}
     result = await get_response(reader=kwargs['reader'], writer=kwargs['writer'], request=request)
     if result['status'] == '201':
@@ -96,6 +117,9 @@ async def deactivate_vms(**kwargs):
 
 
 async def update_vms(**kwargs):
+    """
+    Обновить авторизированную ВМ.
+    """
     vm_id = input('ID Виртуальной машины: ')
     ram_vol = input('Объем памяти: ')
     cpu_cores = input('Количество ядер: ')
@@ -118,6 +142,9 @@ async def update_vms(**kwargs):
 
 
 async def hd_devices(**kwargs):
+    """
+    Распечатать список ЖД устройств.
+    """
     request = {'cmd': kwargs['command'], 'meth': 'GET'}
     result = await get_response(reader=kwargs['reader'], writer=kwargs['writer'], request=request)
     if result['status'] == '200':
@@ -179,6 +206,7 @@ async def authenticate(**kwargs):
         return 'success'
     
 
+# фабрика команд
 command_fabric = {
     '1': create_vm,
     '2': connected_vms,
