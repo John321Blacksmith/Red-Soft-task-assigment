@@ -19,7 +19,7 @@ class VMManager:
         self.db_manager = DBManager(**conf)
         self.authorized_profiles: dict[str, Profile] = {}
 
-    def mutation(funct):
+    def mutation(self, funct):
         @wraps(funct)
         async def wrapper(*args, **kwargs):
             try:
@@ -29,8 +29,19 @@ class VMManager:
             else:
                 return {'status': '201', 'result': result}
         return wrapper
-            
 
+    def query(self, funct):
+        @wraps(funct)
+        async def wrapper(*args, **kwargs):
+            try:
+                result = await funct(*args, **kwargs)
+            except DBError:
+                return {'message': '404'}
+            else:
+                return {'message': '200', 'results': result}
+        return wrapper
+            
+    @query
     async def list_vms(self) -> List[VirtualMachine]:
         """
         Сериализация списка всех ВМ.
@@ -49,6 +60,7 @@ class VMManager:
                 ]}
         return {'message': '404'}
 
+    @query
     async def list_authorized_vms(self) -> List[VirtualMachine]:
         """
         Сериализация списка авторизированных ВМ.
@@ -64,6 +76,7 @@ class VMManager:
             ]
         return {'status': '200', 'results': result}
 
+    @query
     async def list_connected_vms(self)-> List[VirtualMachine]:
         """
         Сериализация списка подключненных ВМ
@@ -81,6 +94,7 @@ class VMManager:
             return {'status': '200', 'results': result}
         return {'status': '404'}
 
+    @query
     async def list_connectable_vms(self) -> List[VirtualMachine]:
         """
         Сериализация списка подключаемых ВМ.
@@ -98,6 +112,7 @@ class VMManager:
             return {'status': '200', 'results': result}
         return {'status': '404'}
 
+    @mutation
     async def logout_vm(self, **body) -> bool:
         """
         Процесс выхода ВМ из списка подключенных.
@@ -107,6 +122,7 @@ class VMManager:
             return {'status': '201'}
         return {'status': '400'}
 
+    @query
     async def list_hard_drives(self) -> List[HardDrive]:
         """
         Сериализация списка всех ЖД.
