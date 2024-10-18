@@ -3,7 +3,7 @@ import asyncio
 from json import dumps, loads
 from colorama import init as c_init
 from colorama import Fore, Style
-from commands import command_fabric, authenticate
+from commands import command_factory, authenticate
 
 
 c_init(autoreset=True)
@@ -39,8 +39,8 @@ async def administer_vms(reader, writer):
     """
     while True:
         command = input('> ').strip()
-        if command in command_fabric:
-            await command_fabric[command](reader=reader, writer=writer, command=command, cache=cache)
+        if command in command_factory:
+            await command_factory[command](reader=reader, writer=writer, command=command, cache=cache)
         
         # print all commands
         elif command == '--help':

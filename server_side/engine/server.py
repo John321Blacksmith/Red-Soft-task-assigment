@@ -72,6 +72,7 @@ async def handle_requests(reader, writer):
                     result = await routes[request['cmd']]()
                 else:
                     result = dumps({'message': 'method not allowed'})
+                print(result)
                 writer.write(dumps(result).encode('utf8')) # serialize data for the client
                 await writer.drain()
             else:

@@ -36,9 +36,9 @@ class VMManager:
             try:
                 result = await funct(self, *args, **kwargs)
             except DBError:
-                return {'message': '404'}
+                return {'status': '404'}
             else:
-                return {'message': '200', 'results': result}
+                return {'status': '200', 'results': result}
         return wrapper
             
     @query
@@ -47,17 +47,15 @@ class VMManager:
         Сериализация списка всех ВМ.
         """
         queryset = await self.db_manager.select_vms()
-        result = {
-                'message': '200',
-                'results': [
-                        {
-                            'id': r['vm_id'],
-                            'ram_vol': r['ram_vol'],
-                            'cpu': r['cpu_cores_amount'],
-                            'overall_hd_space': r['overall_hd_space']
+        results = [
+                    {
+                        'id': r['vm_id'],
+                        'ram_vol': r['ram_vol'],
+                        'cpu': r['cpu_cores_amount'],
+                        'overall_hd_space': r['overall_hd_space']
                     } for r in queryset
-                ]}
-        return result
+                ]
+        return results
 
     @query
     async def list_authorized_vms(self) -> List[VirtualMachine]:
@@ -65,7 +63,7 @@ class VMManager:
         Сериализация списка авторизированных ВМ.
         """
         queryset = await self.db_manager.select_authorized_vms()
-        result = [
+        results = [
                 {
                     'vm_id': r['vm_id'],
                     'ram_vol': r['ram_vol'],
@@ -73,7 +71,7 @@ class VMManager:
                     'overall_hd_space': r['overall_hd_space']
                 } for r in queryset
             ]
-        return result
+        return results
 
     @query
     async def list_connected_vms(self)-> List[VirtualMachine]:

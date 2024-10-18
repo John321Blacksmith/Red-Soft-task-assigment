@@ -207,7 +207,7 @@ async def authenticate(**kwargs):
     
 
 # фабрика команд
-command_fabric = {
+command_factory = {
     '1': create_vm,
     '2': connected_vms,
     '3': authorized_vms,
