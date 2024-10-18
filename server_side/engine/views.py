@@ -30,7 +30,7 @@ class VMManager:
                 return {'status': '201', 'result': result}
         return wrapper
 
-    def query(self, funct):
+    def query(funct):
         @wraps(funct)
         async def wrapper(self, *args, **kwargs):
             try:
