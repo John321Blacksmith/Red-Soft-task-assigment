@@ -47,8 +47,7 @@ class VMManager:
         Сериализация списка всех ВМ.
         """
         queryset = await self.db_manager.select_vms()
-        if queryset:
-            return {
+        result = {
                 'message': '200',
                 'results': [
                         {
@@ -58,7 +57,7 @@ class VMManager:
                             'overall_hd_space': r['overall_hd_space']
                     } for r in queryset
                 ]}
-        return {'message': '404'}
+        return result
 
     @query
     async def list_authorized_vms(self) -> List[VirtualMachine]:
@@ -74,7 +73,7 @@ class VMManager:
                     'overall_hd_space': r['overall_hd_space']
                 } for r in queryset
             ]
-        return {'status': '200', 'results': result}
+        return result
 
     @query
     async def list_connected_vms(self)-> List[VirtualMachine]:
@@ -82,8 +81,7 @@ class VMManager:
         Сериализация списка подключненных ВМ
         """
         queryset = await self.db_manager.select_connected_vms()
-        if queryset:
-            result = [
+        result = [
                     {
                         'vm_id': r['vm_id'],
                         'ram_vol': r['ram_vol'],
@@ -91,8 +89,7 @@ class VMManager:
                         'overall_hd_space': r['overall_hd_space']
                     } for r in queryset
                 ]
-            return {'status': '200', 'results': result}
-        return {'status': '404'}
+        return result
 
     @query
     async def list_connectable_vms(self) -> List[VirtualMachine]:
@@ -100,8 +97,8 @@ class VMManager:
         Сериализация списка подключаемых ВМ.
         """
         queryset = await self.db_manager.select_connectable_vms()
-        if queryset:
-            result = [
+        
+        result = [
                     {
                         'vm_id': r['vm_id'],
                         'ram_vol': r['ram_vol'],
@@ -109,8 +106,7 @@ class VMManager:
                         'overall_hd_space': r['overall_hd_space']
                     } for r in queryset
                 ]
-            return {'status': '200', 'results': result}
-        return {'status': '404'}
+        return result
 
     @mutation
     async def logout_vm(self, **body) -> bool:
@@ -118,18 +114,15 @@ class VMManager:
         Процесс выхода ВМ из списка подключенных.
         """
         result = await self.db_manager.logout_vm(**body)
-        if result:
-            return {'status': '201'}
-        return {'status': '400'}
-
+        return result
+    
     @query
     async def list_hard_drives(self) -> List[HardDrive]:
         """
         Сериализация списка всех ЖД.
         """
         queryset = await self.db_manager.select_hard_drives()
-        if queryset:
-            result = [
+        result = [
                 {
                     'hd_id': r['hd_id'],
                     'vm_id': r['vm_id'],
@@ -137,8 +130,7 @@ class VMManager:
 
                 } for r in queryset
             ]
-            return {'status': '200', 'results': result}
-        return {'status': '404'}
+        return result
 
     async def authentificate(self, **body):
         """
