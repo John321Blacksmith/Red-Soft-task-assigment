@@ -1,7 +1,8 @@
 import sys
 sys.path.append('../')
 from typing import List
-from db.transactions import DBManager
+from functools import wraps
+from db.transactions import DBManager, DBError
 from .models import HardDrive, VirtualMachine, Profile, Connection
 
 
@@ -17,6 +18,17 @@ class VMManager:
     def __init__(self, **conf):
         self.db_manager = DBManager(**conf)
         self.authorized_profiles: dict[str, Profile] = {}
+
+    def mutation(funct):
+        @wraps(funct)
+        async def wrapper(*args, **kwargs):
+            try:
+                result = await funct(*args, **kwargs)
+            except DBError:
+                return {'status': '400'}
+            else:
+                return {'status': '201'}
+            
 
     async def list_vms(self) -> List[VirtualMachine]:
         """
@@ -137,54 +149,50 @@ class VMManager:
                 return {'status': '401'}
         return {'status': '200', 'credentials': self.authorized_profiles[body['login']]}
         
+    @mutation
     async def setup_storage(self):
         """
         Процесс создания базы данных
         на Postgres сервере.
         """
         result = await self.db_manager.create_db()
-        if result:
-            return {'status': '201'}
-        return {'status': '400'}
+        return result
     
+    @mutation
     async def create_tables(self):
         """
         Процесс создания всех таблиц.
         """
         result = await self.db_manager.create_tables()
-        if result:
-            return {'status': '201'}
-        return {'status': '400'}
+        return result
 
+    @mutation
     async def add_new_vm(self, **body):
         """
         Процесс добавления новой ВМ.
         """
         result = await self.db_manager.create_vm(**body)
-        if result:
-            return {'status': '201'}
-        return {'status': '400'}
+        return result
 
+    @mutation
     async def add_new_hd(self, **body):
         """
         Процесс добавления нового ЖД
         с привязкой к ВМ.
         """
         result = await self.db_manager.create_hd(**body)
-        if result:
-            return {'status': '201'}
-        return {'status': '400'}
+        return result
         
+    @mutation
     async def update_vm_data(self, vm_id: int, **body):
         """
         Процесс обновления авторизированной
         ВМ.
         """
         result = await self.db_manager.update_vm(vm_id, **body)
-        if result:
-            return {'status': '201'}
-        return {'status': '400'}
+        return result
         
+    @mutation
     async def add_profile(self, **body):
         """
         Процесс создания нового
