@@ -1,9 +1,16 @@
+from functools import wraps
 from json import loads, dumps
 from colorama import init as c_init
 from colorama import Fore, Style
 
 c_init(autoreset=True)
 
+
+async def get_response(**kwargs):
+    kwargs['writer'].write(dumps(kwargs['request']).encode('utf8'))
+    result = loads(await kwargs['reader'].read(4096))
+    return result
+    
 
 async def create_vm(**kwargs):
     ram_vol = input('Объем памяти (Гб): ')
@@ -25,8 +32,7 @@ async def create_vm(**kwargs):
                             'hd_devices': hd_devices
                     }
             }
-    kwargs['writer'].write(dumps(request).encode('utf8'))
-    result = loads(await kwargs['reader'].read(255))
+    result = await get_response(reader=kwargs['reader'], writer=kwargs['writer'], request=request)
     if result['status'] == '201':
         print(f'{Fore.YELLOW}ВМ успешно создана.')
     else:
@@ -36,8 +42,7 @@ async def create_vm(**kwargs):
 
 async def authorized_vms(**kwargs):
     request = {'cmd': kwargs['command'], 'meth': 'GET'}
-    kwargs['writer'].write(dumps(request).encode('utf8'))
-    result = loads(await kwargs['reader'].read(10000))
+    result = await get_response(reader=kwargs['reader'], writer=kwargs['writer'], request=request)
     if result['status'] == '200':
         if len(result['results']):
             print('------------------------------')
@@ -52,8 +57,7 @@ async def authorized_vms(**kwargs):
 
 async def connected_vms(**kwargs):
     request = {'cmd': kwargs['command'], 'meth': 'GET'}
-    kwargs['writer'].write(dumps(request).encode('utf8'))
-    result = loads(await kwargs['reader'].read(10000))
+    result = await get_response(reader=kwargs['reader'], writer=kwargs['writer'], request=request)
     if result['status'] == '200':
         if len(result['results']):
             print('------------------------------')
@@ -69,8 +73,7 @@ async def connected_vms(**kwargs):
 
 async def connectable_vms(**kwargs):
     request = {'cmd': kwargs['command'], 'meth': 'GET'}
-    kwargs['writer'].write(dumps(request).encode('utf8'))
-    result = loads(await kwargs['reader'].read(10000))
+    result = await get_response(reader=kwargs['reader'], writer=kwargs['writer'], request=request)
     if result['status'] == '200':
         if len(result['results']):
             print('------------------------------')
@@ -86,8 +89,7 @@ async def connectable_vms(**kwargs):
 
 async def deactivate_vms(**kwargs):
     request = {'cmd': kwargs['command'], 'meth': 'POST', 'body': {'prof_id': kwargs['cache']['credentials']['prof_id']}}
-    kwargs['writer'].write(dumps(request).encode('utf8'))
-    result = loads(await kwargs['reader'].read(255))
+    result = await get_response(reader=kwargs['reader'], writer=kwargs['writer'], request=request)
     if result['status'] == '201':
         print(f'{Fore.LIGHTBLUE_EX}Ваша ВМ деактивирована')
     await kwargs['writer'].drain()
@@ -107,8 +109,7 @@ async def update_vms(**kwargs):
                         'cpu_cores_amount': cpu_cores
                     }
             }
-    kwargs['writer'].write(dumps(request).encode('utf8'))
-    result = loads(await kwargs['reader'].read(255))
+    result = await get_response(reader=kwargs['reader'], writer=kwargs['writer'], request=request)
     if result:
         print(f'{Fore.YELLOW}Данные виртуальной машины #{vm_id} изменены')
     else:
@@ -118,8 +119,7 @@ async def update_vms(**kwargs):
 
 async def hd_devices(**kwargs):
     request = {'cmd': kwargs['command'], 'meth': 'GET'}
-    kwargs['writer'].write(dumps(request).encode('utf8'))
-    result = loads(await kwargs['reader'].read(10000))
+    result = await get_response(reader=kwargs['reader'], writer=kwargs['writer'], request=request)
     if result['status'] == '200':
         if len(result['results']):
             print('------------------------------')
