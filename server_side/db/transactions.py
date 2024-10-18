@@ -34,9 +34,9 @@ class DBManager:
         Проверка процесса транзакции на исключенияю
         """
         @wrapper(funct)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(self, *args, **kwargs):
             try:
-                result = await funct(*args, **kwargs)
+                result = await funct(self, *args, **kwargs)
             except (ValueError, TypeError):
                 raise DBError('Данные не получены')
             else:
